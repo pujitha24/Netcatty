@@ -82,8 +82,12 @@ function isDefaultCmdPromptLine(line) {
   return CMD_PROMPT_PATTERN.test(String(line || "").replace(/\s+$/, ""));
 }
 
+// Python virtualenv / Conda prefixes (`(venv) `, `(base) `, `(3.12.12) `) that
+// activation scripts prepend to PS1 before the default prompt.
+const ENV_PREFIX_PATTERN = /^(?:\([A-Za-z0-9_.+-]+\)\s?)+/;
+
 function isDefaultPosixPromptLine(line) {
-  const normalized = String(line || "").replace(/\s+$/, "");
+  const normalized = String(line || "").replace(/\s+$/, "").replace(ENV_PREFIX_PATTERN, "");
   return POSIX_PROMPT_PATTERN.test(normalized) || ALPINE_PROMPT_PATTERN.test(normalized);
 }
 

@@ -132,6 +132,21 @@ test("isDefaultCmdPromptLine matches drive-letter cmd prompts only", () => {
   assert.equal(isDefaultCmdPromptLine(""), false);
 });
 
+test("isDefaultPosixPromptLine accepts Python environment prefixes", () => {
+  assert.equal(isDefaultPosixPromptLine("(3.12.12) root@example:~# "), true);
+  assert.equal(isDefaultPosixPromptLine("(venv) alice@host:~$"), true);
+  assert.equal(isDefaultPosixPromptLine("(base) (venv) [opc@host ~]$"), true);
+  assert.equal(isDefaultPosixPromptLine("(3.12.12)root@example:~# "), true);
+  assert.equal(isDefaultPosixPromptLine("(venv) not a prompt"), false);
+  assert.equal(isDefaultPosixPromptLine("(venv) "), false);
+});
+
+test("trackSessionIdlePrompt caches a fresh prompt with a Python environment prefix", () => {
+  const session = { _promptTrackTail: "", lastIdlePrompt: "" };
+  trackSessionIdlePrompt(session, "Welcome\r\n(3.12.12) root@example:~# ");
+  assert.equal(Boolean(getFreshIdlePrompt(session)), true);
+});
+
 test("isDefaultPosixPromptLine matches classic user@host prompts", () => {
   assert.equal(isDefaultPosixPromptLine("alice@host:~$"), true);
   assert.equal(isDefaultPosixPromptLine("user@host:~$"), true);
